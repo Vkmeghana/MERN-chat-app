@@ -17,19 +17,17 @@ const ENDPOINT = "http://localhost:5000";
 var socket, selectedChatCompare;
 
 
-const SingleChat = (fetchAgain, setFetchAgain) => {
-
-     const [messages, setMessages] = useState([]);
+const SingleChat = () => {
+  const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [newMessage, setNewMessage] = useState("");
-    
-    const { user, selectedChat, setSelectedChat } = ChatState();
-  const toast = useToast();
   const [socketConnected, setSocketConnected] = useState(false);
   const [typing, setTyping] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
+  const toast = useToast();
+  const [fetchAgain, setFetchAgain] = useState([]);
 
-   const defaultOptions = {
+  const defaultOptions = {
     loop: true,
     autoplay: true,
     animationData: animationData,
@@ -37,6 +35,9 @@ const SingleChat = (fetchAgain, setFetchAgain) => {
       preserveAspectRatio: "xMidYMid slice",
     },
   };
+  const { selectedChat, setSelectedChat, user, notification, setNotification } =
+    ChatState();
+
 
   const fetchMessages = async () => {
     if (!selectedChat) return;
@@ -94,7 +95,11 @@ const SingleChat = (fetchAgain, setFetchAgain) => {
         !selectedChatCompare || // if chat is not selected or doesn't match current chat
         selectedChatCompare._id !== newMessageRecieved.chat._id
       ) {
-        
+        if (!notification.includes(newMessageRecieved)) {
+          setNotification([newMessageRecieved, ...notification]);
+          setFetchAgain(!fetchAgain);
+          
+        }
       } else {
         setMessages([...messages, newMessageRecieved]);
       }
